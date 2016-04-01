@@ -1,0 +1,46 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.github.dmexe.logfmt</groupId>
+  <artifactId>logfmt</artifactId>
+  <packaging>jar</packaging>
+  <version>1.1-SNAPSHOT</version>
+  <name>logfmt</name>
+  <url>http://maven.apache.org</url>
+
+  <properties>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.12</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>1.1.6</version>
+      <optional>true</optional>
+    </dependency>
+  </dependencies>
+
+  <scm>
+    <connection>scm:git:https://github.com/dmexe/logfmt-java.git</connection>
+    <developerConnection>scm:git:git@github.com:dmexe/logfmt-java.git</developerConnection>
+    <url>https://github.com/dmexe/logfmt-java</url>
+    <tag>HEAD</tag>
+  </scm>
+
+  <distributionManagement>
+    <repository>
+      <id>bintray-dmexe-maven</id>
+      <name>dmexe-maven</name>
+      <url>https://api.bintray.com/maven/dmexe/maven/logfmt/;publish=1</url>
+      <layout>default</layout>
+    </repository>
+  </distributionManagement>
+</project>
