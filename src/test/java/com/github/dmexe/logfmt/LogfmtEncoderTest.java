@@ -72,20 +72,21 @@ public class LogfmtEncoderTest
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         Logger log = getLogger(stream);
 
-        Map<String,String> items = new HashMap<>();
+        Map<String,Object> items = new HashMap<>();
         items.put("first", "first value");
-        items.put("second", "second value");
+        items.put("int", 1);
+        items.put("bool", true);
 
         log.info("test {} {}", value("argKey", "arg value"), entries(items), value("hidden", "hide me"));
 
         String output = stream.toString();
 
         assertThat(output, containsString("level=info"));
-        assertThat(output, containsString("msg=\"test argKey=\\\"arg value\\\" first=\\\"first"));
+        assertThat(output, containsString("msg=\"test argKey=\\\"arg value\\\" bool=true first=\\\"first"));
         assertThat(output, containsString("logger=demo.LogfmtEncoderTest"));
         assertThat(output, containsString("argKey=\"arg value\""));
         assertThat(output, containsString("first=\"first value\""));
-        assertThat(output, containsString("second=\"second value\""));
+        assertThat(output, containsString("int=1"));
         assertThat(output, containsString("hidden=\"hide me\""));
         assertThat(output, containsString("thread=main\n"));
     }
@@ -107,7 +108,7 @@ public class LogfmtEncoderTest
         assertThat(output, containsString("msg=\"catch: boom!\""));
         assertThat(output, containsString("logger=demo.LogfmtEncoderTest"));
         assertThat(output, containsString("err=java.lang.RuntimeException"));
-        assertThat(output, containsString("stacktrace=\"[LogfmtEncoderTest.java:99:demo.LogfmtEncoderTest#testStackTrace]["));
+        assertThat(output, containsString("stacktrace=\"[LogfmtEncoderTest.java:100:demo.LogfmtEncoderTest#testStackTrace]["));
         assertThat(output, containsString("]\" thread=main\n"));
     }
 

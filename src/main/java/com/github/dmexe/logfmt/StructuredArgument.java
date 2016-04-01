@@ -7,7 +7,7 @@ public class StructuredArgument {
         return new KeyValueArgument(key, value);
     }
 
-    public static BaseArgument entries(Map<String,String> args) {
+    public static BaseArgument entries(Map<String,Object> args) {
         return new MapArgument(args);
     }
 }

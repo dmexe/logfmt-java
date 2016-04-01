@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Map;
 
 class MapArgument implements BaseArgument {
-    private Map<String,String> args;
+    private Map<String,Object> args;
 
-    public MapArgument(Map<String,String> args) {
+    public MapArgument(Map<String,Object> args) {
         this.args = args;
     }
 
@@ -18,8 +18,8 @@ class MapArgument implements BaseArgument {
         }
 
         List<String> list = new LinkedList<>();
-        for (Map.Entry<String,String> entry : args.entrySet()) {
-            String value = String.format("%s=%s", entry.getKey(), LogfmtEncoder.quote(entry.getValue()));
+        for (Map.Entry<String,Object> entry : args.entrySet()) {
+            String value = String.format("%s=%s", entry.getKey(), LogfmtEncoder.quote(entry.getValue().toString()));
             list.add(value);
         }
         return String.join(" ", list);
@@ -27,8 +27,8 @@ class MapArgument implements BaseArgument {
 
     @Override
     public void writeTo(StringBuilder sb) {
-        for (Map.Entry<String,String> entry : args.entrySet()) {
-            sb.append(entry.getKey()).append("=").append(LogfmtEncoder.quote(entry.getValue())).append(" ");
+        for (Map.Entry<String,Object> entry : args.entrySet()) {
+            sb.append(entry.getKey()).append("=").append(LogfmtEncoder.quote(entry.getValue().toString())).append(" ");
         }
     }
 }
