@@ -1,9 +1,10 @@
-package com.github.dmexe.logfmt;
+package demo;
 
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.OutputStreamAppender;
+import com.github.dmexe.logfmt.LogfmtEncoder;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -41,7 +42,7 @@ public class LogfmtEncoderTest
 
         assertThat(output, containsString("level=info"));
         assertThat(output, containsString("msg=\"info msg  new line return\""));
-        assertThat(output, containsString("logger=com.github.dmexe.logfmt.LogfmtEncoderTest"));
+        assertThat(output, containsString("logger=demo.LogfmtEncoderTest"));
         assertThat(output, containsString("thread=main\n"));
     }
 
@@ -61,7 +62,7 @@ public class LogfmtEncoderTest
 
         assertThat(output, containsString("level=info"));
         assertThat(output, containsString("msg=test"));
-        assertThat(output, containsString("logger=com.github.dmexe.logfmt.LogfmtEncoderTest"));
+        assertThat(output, containsString("logger=demo.LogfmtEncoderTest"));
         assertThat(output, containsString("mdcKey=mdcValue"));
         assertThat(output, containsString("thread=main\n"));
     }
@@ -81,7 +82,7 @@ public class LogfmtEncoderTest
 
         assertThat(output, containsString("level=info"));
         assertThat(output, containsString("msg=\"test argKey=\\\"arg value\\\" first=\\\"first"));
-        assertThat(output, containsString("logger=com.github.dmexe.logfmt.LogfmtEncoderTest"));
+        assertThat(output, containsString("logger=demo.LogfmtEncoderTest"));
         assertThat(output, containsString("argKey=\"arg value\""));
         assertThat(output, containsString("first=\"first value\""));
         assertThat(output, containsString("second=\"second value\""));
@@ -104,9 +105,9 @@ public class LogfmtEncoderTest
 
         assertThat(output, containsString("level=error"));
         assertThat(output, containsString("msg=\"catch: boom!\""));
-        assertThat(output, containsString("logger=com.github.dmexe.logfmt.LogfmtEncoderTest"));
+        assertThat(output, containsString("logger=demo.LogfmtEncoderTest"));
         assertThat(output, containsString("err=java.lang.RuntimeException"));
-        assertThat(output, containsString("stacktrace=\"[LogfmtEncoderTest.java:98:com.github.dmexe.logfmt.LogfmtEncoderTest#testStackTrace]["));
+        assertThat(output, containsString("stacktrace=\"[LogfmtEncoderTest.java:99:demo.LogfmtEncoderTest#testStackTrace]["));
         assertThat(output, containsString("]\" thread=main\n"));
     }
 

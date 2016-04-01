@@ -2,7 +2,7 @@ package com.github.dmexe.logfmt;
 
 import java.util.*;
 
-class StructuredArgument {
+public class StructuredArgument {
     public static BaseArgument value(String key, Object value) {
         return new KeyValueArgument(key, value);
     }
