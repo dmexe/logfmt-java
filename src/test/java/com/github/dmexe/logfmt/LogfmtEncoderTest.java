@@ -18,9 +18,11 @@ import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-public class LogfmtEncoderTest
-        extends TestCase
+public class LogfmtEncoderTest extends TestCase
 {
+
+    LogfmtEncoder encoder = null;
+
     public LogfmtEncoderTest(String testName)
     {
         super( testName );
@@ -67,6 +69,54 @@ public class LogfmtEncoderTest
         assertThat(output, containsString("thread=main\n"));
     }
 
+    public void testMDCIncluded()
+    {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        Logger log = getLogger(stream);
+        this.encoder.setIncludeMdcKeyName("incKey");
+
+        try {
+            MDC.put("mdcKey", "mdcValue");
+            MDC.put("incKey", "incValue");
+            log.info("test");
+        } finally {
+            MDC.clear();
+        }
+
+        String output = stream.toString();
+
+        assertThat(output, containsString("level=info"));
+        assertThat(output, containsString("msg=test"));
+        assertThat(output, containsString("logger=demo.LogfmtEncoderTest"));
+        assertThat(output, containsString("incKey=incValue"));
+        assertThat(output, not(containsString("mdcKey")));
+        assertThat(output, containsString("thread=main\n"));
+    }
+
+    public void testMDCExcluded()
+    {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        Logger log = getLogger(stream);
+        this.encoder.setExcludeMdcKeyName("mdcKey");
+
+        try {
+            MDC.put("mdcKey", "mdcValue");
+            MDC.put("incKey", "incValue");
+            log.info("test");
+        } finally {
+            MDC.clear();
+        }
+
+        String output = stream.toString();
+
+        assertThat(output, containsString("level=info"));
+        assertThat(output, containsString("msg=test"));
+        assertThat(output, containsString("logger=demo.LogfmtEncoderTest"));
+        assertThat(output, containsString("incKey=incValue"));
+        assertThat(output, not(containsString("mdcKey")));
+        assertThat(output, containsString("thread=main\n"));
+    }
+
     public void testStructuredArgument()
     {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -108,7 +158,7 @@ public class LogfmtEncoderTest
         assertThat(output, containsString("msg=\"catch: boom!\""));
         assertThat(output, containsString("logger=demo.LogfmtEncoderTest"));
         assertThat(output, containsString("err=java.lang.RuntimeException"));
-        assertThat(output, containsString("stacktrace=\"[LogfmtEncoderTest.java:100:demo.LogfmtEncoderTest#testStackTrace]["));
+        assertThat(output, containsString("stacktrace=\"[LogfmtEncoderTest.java:150:demo.LogfmtEncoderTest#testStackTrace]["));
         assertThat(output, containsString("]\" thread=main\n"));
     }
 
@@ -127,6 +177,8 @@ public class LogfmtEncoderTest
 
         Logger log = context.getLogger(this.getClass());
         log.addAppender(appender);
+
+        this.encoder = encoder;
         return log;
     }
 }

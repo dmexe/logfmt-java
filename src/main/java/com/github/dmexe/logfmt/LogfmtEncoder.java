@@ -6,18 +6,27 @@ import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.encoder.EncoderBase;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class LogfmtEncoder extends EncoderBase<ILoggingEvent> {
 
-    private boolean includeTime = true;
-
-    private boolean isIncludeTime() {
-        return includeTime;
-    }
+    private boolean           includeTime        = true;
+    private ArrayList<String> includeMdcKeyNames = new ArrayList<>();
+    private ArrayList<String> excludeMdcKeyNames = new ArrayList<>();
 
     public void setIncludeTime(boolean flag) {
         includeTime = flag;
+    }
+
+    public void setIncludeMdcKeyName(String keyName) {
+        this.includeMdcKeyNames.add(keyName);
+    }
+
+    public void setExcludeMdcKeyName(String keyName) {
+        this.excludeMdcKeyNames.add(keyName);
     }
 
     @Override
@@ -40,7 +49,7 @@ public class LogfmtEncoder extends EncoderBase<ILoggingEvent> {
         }
 
         append(sb, "level",  level);
-        if (isIncludeTime()) {
+        if (this.includeTime) {
             append(sb, "time",   time);
         }
         append(sb, "msg",    msg);
@@ -75,6 +84,16 @@ public class LogfmtEncoder extends EncoderBase<ILoggingEvent> {
 
         if (mdc == null || mdc.isEmpty()) {
             return;
+        }
+
+        if (!this.includeMdcKeyNames.isEmpty()) {
+            mdc = new HashMap<>(mdc);
+            mdc.keySet().retainAll(this.includeMdcKeyNames);
+        }
+
+        if (!this.excludeMdcKeyNames.isEmpty()) {
+            mdc = new HashMap<>(mdc);
+            mdc.keySet().removeAll(this.excludeMdcKeyNames);
         }
 
         for (Map.Entry<String, String> entry : mdc.entrySet()) {
