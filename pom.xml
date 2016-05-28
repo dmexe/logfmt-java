@@ -3,7 +3,7 @@
   <groupId>com.github.dmexe.logfmt</groupId>
   <artifactId>logfmt</artifactId>
   <packaging>jar</packaging>
-  <version>1.0.3</version>
+  <version>1.0.4</version>
   <name>logfmt</name>
   <url>http://maven.apache.org</url>
 
