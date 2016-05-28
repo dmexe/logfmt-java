@@ -21,7 +21,7 @@ import java.util.Map;
 public class LogfmtEncoderTest extends TestCase
 {
 
-    LogfmtEncoder encoder = null;
+    private LogfmtEncoder encoder = null;
 
     public LogfmtEncoderTest(String testName)
     {
@@ -147,8 +147,8 @@ public class LogfmtEncoderTest extends TestCase
         Logger log = getLogger(stream);
 
         try {
-            throw new RuntimeException("boom!");
-        } catch (RuntimeException e){
+            throw new RuntimeException("boom!", new RuntimeException("test"));
+        } catch (Exception e){
             log.error("catch", e);
         }
 
@@ -159,6 +159,7 @@ public class LogfmtEncoderTest extends TestCase
         assertThat(output, containsString("logger=demo.LogfmtEncoderTest"));
         assertThat(output, containsString("err=java.lang.RuntimeException"));
         assertThat(output, containsString("stacktrace=\"[LogfmtEncoderTest.java:150:demo.LogfmtEncoderTest#testStackTrace]["));
+        assertThat(output, containsString("[Caused by: java.lang.RuntimeException: test]"));
         assertThat(output, containsString("]\" thread=main\n"));
     }
 

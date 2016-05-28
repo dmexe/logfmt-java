@@ -8,7 +8,6 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class LogfmtEncoder extends EncoderBase<ILoggingEvent> {
@@ -36,23 +35,23 @@ public class LogfmtEncoder extends EncoderBase<ILoggingEvent> {
     public void doEncode(ILoggingEvent event) throws java.io.IOException {
         StringBuilder sb = new StringBuilder(128);
 
-        String level        = event.getLevel().toString().toLowerCase();
-        String time         = java.time.Instant.ofEpochMilli(event.getTimeStamp()).toString();
-        String thread       = event.getThreadName();
-        String logger       = event.getLoggerName();
+        String level = event.getLevel().toString().toLowerCase();
+        String time = java.time.Instant.ofEpochMilli(event.getTimeStamp()).toString();
+        String thread = event.getThreadName();
+        String logger = event.getLoggerName();
         IThrowableProxy err = event.getThrowableProxy();
-        String msg          = event.getFormattedMessage();
+        String msg = event.getFormattedMessage();
 
         if (err != null) {
             msg += ": ";
             msg += err.getMessage();
         }
 
-        append(sb, "level",  level);
+        append(sb, "level", level);
         if (this.includeTime) {
-            append(sb, "time",   time);
+            append(sb, "time", time);
         }
-        append(sb, "msg",    msg);
+        append(sb, "msg", msg);
         append(sb, "logger", logger);
 
         addMDC(sb, event.getMDCPropertyMap());
@@ -107,26 +106,59 @@ public class LogfmtEncoder extends EncoderBase<ILoggingEvent> {
         }
 
         append(sb, "err", err.getClassName());
-        StackTraceElementProxy[] st = err.getStackTraceElementProxyArray();
         StringBuilder stBuilder = new StringBuilder(128);
 
-        for (StackTraceElementProxy it : st) {
-            StackTraceElement elem = it.getStackTraceElement();
-            if (elem != null) {
-                String file  = it.getStackTraceElement().getFileName();
-                String klass = it.getStackTraceElement().getClassName();
-                String func  = it.getStackTraceElement().getMethodName();
-                int line     = it.getStackTraceElement().getLineNumber();
-                stBuilder
-                        .append("[")
-                        .append(file).append(":")
-                        .append(line).append(":")
-                        .append(klass).append("#")
-                        .append(func)
-                        .append("]");
-            }
+        for (StackTraceElementProxy it : err.getStackTraceElementProxyArray()) {
+            addStackTraceElement(stBuilder, it.getStackTraceElement());
         }
+        addErrorCause(stBuilder, err);
         append(sb, "stacktrace", stBuilder.toString());
+    }
+
+    private void addErrorCause(StringBuilder stringBuilder, IThrowableProxy err) {
+        if (err == null) {
+            return;
+        }
+
+        IThrowableProxy cause = err.getCause();
+        if (cause == null) {
+            return;
+        }
+
+        addStackTraceElement(stringBuilder, cause);
+        for (StackTraceElementProxy it : cause.getStackTraceElementProxyArray()) {
+            addStackTraceElement(stringBuilder, it.getStackTraceElement());
+        }
+
+        addErrorCause(stringBuilder, cause.getCause());
+    }
+
+    private void addStackTraceElement(StringBuilder stringBuilder, IThrowableProxy err) {
+        if (err != null) {
+            stringBuilder
+                    .append("[")
+                    .append("Caused by: ")
+                    .append(err.getClassName())
+                    .append(": ")
+                    .append(err.getMessage())
+                    .append("]");
+        }
+    }
+
+    private void addStackTraceElement(StringBuilder stringBuilder, StackTraceElement elem) {
+        if (elem != null) {
+            String file  = elem.getFileName();
+            String clazz = elem.getClassName();
+            String func  = elem.getMethodName();
+            int line     = elem.getLineNumber();
+            stringBuilder
+                    .append("[")
+                    .append(file).append(":")
+                    .append(line).append(":")
+                    .append(clazz).append("#")
+                    .append(func)
+                    .append("]");
+        }
     }
 
     private void append(StringBuilder sb, String key, String value) {
@@ -136,7 +168,7 @@ public class LogfmtEncoder extends EncoderBase<ILoggingEvent> {
         sb.append(" ");
     }
 
-    public static boolean needsQuoting(String string) {
+    private static boolean needsQuoting(String string) {
         int  i;
         char ch;
         for (i = 0 ; i < string.length(); i ++) {
