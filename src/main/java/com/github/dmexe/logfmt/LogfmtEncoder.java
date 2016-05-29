@@ -112,7 +112,9 @@ public class LogfmtEncoder extends EncoderBase<ILoggingEvent> {
             addStackTraceElement(stBuilder, it.getStackTraceElement());
         }
         addErrorCause(stBuilder, err);
-        append(sb, "stacktrace", stBuilder.toString());
+        if (stBuilder.length() > 0) {
+            append(sb, "stacktrace", stBuilder.toString());
+        }
     }
 
     private void addErrorCause(StringBuilder stringBuilder, IThrowableProxy err) {
