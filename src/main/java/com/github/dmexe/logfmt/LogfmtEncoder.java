@@ -223,4 +223,43 @@ public class LogfmtEncoder extends EncoderBase<ILoggingEvent> {
         sb.append('"');
         return sb.toString();
     }
+
+    public byte[] encode(Object eventObject) throws java.io.IOException {
+        if (!(eventObject instanceof ILoggingEvent)) throw new RuntimeException("Not yet implemented.");
+        ILoggingEvent event=(ILoggingEvent)eventObject;
+        StringBuilder sb = new StringBuilder(128);
+
+        String level = event.getLevel().toString().toLowerCase();
+        String time = java.time.Instant.ofEpochMilli(event.getTimeStamp()).toString();
+        String thread = event.getThreadName();
+        String logger = event.getLoggerName();
+        IThrowableProxy err = event.getThrowableProxy();
+        String msg = event.getFormattedMessage();
+
+        if (err != null) {
+            msg += ": ";
+            msg += err.getMessage();
+        }
+
+        append(sb, "level", level);
+        if (this.includeTime) {
+            append(sb, "time", time);
+        }
+        append(sb, "msg", msg);
+        append(sb, "logger", logger);
+
+        // Disabled until https://jira.qos.ch/browse/SLF4J-423 is dealt with.
+        // addMDC(sb, event.getMDCPropertyMap());
+        addStructuredArguments(sb, event.getArgumentArray());
+        addError(sb, err);
+
+        sb.append("thread=").append(quote(thread));
+        sb.append(CoreConstants.LINE_SEPARATOR);
+
+        return sb.toString().getBytes();
+    }
+
+    public byte[] headerBytes() {
+        return new byte[]{};
+    }
 }
